@@ -1,0 +1,97 @@
+import sys
+import unittest
+from pathlib import Path
+
+project_root = Path(__file__).resolve().parent.parent
+if str(project_root) not in sys.path:
+    sys.path.insert(0, str(project_root))
+
+from pages.login_page import LoginPage
+from pages.my_account_page import MyAccountPage
+from utils.driver_factory import DriverFactory
+from utils.config_reader import ConfigReader
+from utils.csv_reader import CSVReader
+from utils.screenshot_util import ScreenshotUtil
+
+
+class TestLoginUnittest(unittest.TestCase):
+    """Unittest Framework Test Case for Login Workflows with POM and Failure Screenshot hooks."""
+
+    def setUp(self):
+        self.config = ConfigReader()
+        self.driver = DriverFactory.create_driver()
+        self.login_page = LoginPage(self.driver)
+        self.my_account_page = MyAccountPage(self.driver)
+
+    def tearDown(self):
+        try:
+            # Automated Screenshot on Unittest Failure
+            res = getattr(self._outcome, 'result', None)
+            if res:
+                has_failed = any(test == self for test, _ in getattr(res, 'failures', []) + getattr(res, 'errors', []))
+                if has_failed:
+                    ScreenshotUtil.capture_screenshot(self.driver, f"unittest_{self._testMethodName}")
+        except Exception as e:
+            print(f"Warning in tearDown screenshot hook: {e}")
+        finally:
+            if hasattr(self, 'driver') and self.driver:
+                self.driver.quit()
+
+    def test_valid_login(self):
+        """Verify valid user login routes to My Account dashboard."""
+        self.login_page.open(self.config.login_url)
+        self.login_page.do_login(self.config.valid_email, self.config.valid_password)
+
+        self.assertTrue(
+            self.my_account_page.is_account_page_displayed(),
+            "My Account dashboard should be displayed after valid authentication."
+        )
+        self.assertIn("My Account", self.my_account_page.get_header_text())
+        self.my_account_page.click_logout()
+
+    def test_invalid_password(self):
+        """Verify login with invalid password triggers warning alert banner."""
+        self.login_page.open(self.config.login_url)
+        self.login_page.do_login(self.config.valid_email, "InvalidPassword999!")
+
+        self.assertTrue(
+            self.login_page.is_error_alert_displayed(),
+            "Warning alert banner should be rendered for incorrect password."
+        )
+        self.assertIn(
+            "Warning: No match for E-Mail Address and/or Password.",
+            self.login_page.get_error_message()
+        )
+
+    def test_unregistered_email(self):
+        """Verify login with non-existent email triggers warning alert banner."""
+        self.login_page.open(self.config.login_url)
+        self.login_page.do_login("nonexistent_account_test@domain.com", "SomePassword123!")
+
+        self.assertTrue(
+            self.login_page.is_error_alert_displayed(),
+            "Warning banner should be displayed for non-registered user."
+        )
+        self.assertIn(
+            "Warning: No match for E-Mail Address and/or Password.",
+            self.login_page.get_error_message()
+        )
+
+    def test_data_driven_csv_login(self):
+        """Iterate through login_data.csv records in Unittest."""
+        test_records = CSVReader.get_login_test_data()
+        for record in test_records:
+            with self.subTest(case=record["test_case_id"]):
+                self.login_page.open(self.config.login_url)
+                self.login_page.do_login(record["email"], record["password"])
+
+                if record["expected_status"].upper() == "SUCCESS":
+                    self.assertTrue(self.my_account_page.is_account_page_displayed())
+                    self.my_account_page.click_logout()
+                else:
+                    self.assertTrue(self.login_page.is_error_alert_displayed())
+                    self.assertIn(record["expected_message"], self.login_page.get_error_message())
+
+
+if __name__ == '__main__':
+    unittest.main()

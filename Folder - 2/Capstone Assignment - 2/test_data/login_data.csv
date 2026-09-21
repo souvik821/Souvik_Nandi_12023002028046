@@ -1,0 +1,6 @@
+test_case_id,description,email,password,expected_status,expected_message
+TC_LOGIN_01,Valid user login,souvik_capstone_test2026@gmail.com,Password123!,SUCCESS,My Account
+TC_LOGIN_02,Invalid password,souvik_capstone_test2026@gmail.com,WrongPass123,FAILURE,Warning: No match for E-Mail Address and/or Password.
+TC_LOGIN_03,Non-registered user,unregistered_user_souvik@testing.com,AnyPassword123,FAILURE,Warning: No match for E-Mail Address and/or Password.
+TC_LOGIN_04,Empty credentials,, ,FAILURE,Warning: No match for E-Mail Address and/or Password.
+TC_LOGIN_05,Empty password,souvik_capstone_test2026@gmail.com,,FAILURE,Warning: No match for E-Mail Address and/or Password.

@@ -1,0 +1,6 @@
+test_case_id,description,search_term,expected_status,expected_result
+TC_SEARCH_01,Search for existing product MacBook,MacBook,FOUND,MacBook
+TC_SEARCH_02,Search for existing product iPhone,iPhone,FOUND,iPhone
+TC_SEARCH_03,Search for existing product Samsung,Samsung,FOUND,Samsung
+TC_SEARCH_04,Search for non-existent product,XYZNonExistentItem999,NOT_FOUND,There is no product that matches the search criteria.
+TC_SEARCH_05,Search with special characters,#0InvalidProduct!@#,NOT_FOUND,There is no product that matches the search criteria.
