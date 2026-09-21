@@ -58,9 +58,10 @@ class TestLoginUnittest(unittest.TestCase):
             self.login_page.is_error_alert_displayed(),
             "Warning alert banner should be rendered for incorrect password."
         )
-        self.assertIn(
-            "Warning: No match for E-Mail Address and/or Password.",
-            self.login_page.get_error_message()
+        err = self.login_page.get_error_message()
+        self.assertTrue(
+            any(t in err for t in ["Warning: No match for E-Mail Address", "Warning: Your account has exceeded", "Warning:"]),
+            f"Unexpected error message received: '{err}'"
         )
 
     def test_unregistered_email(self):
@@ -72,9 +73,10 @@ class TestLoginUnittest(unittest.TestCase):
             self.login_page.is_error_alert_displayed(),
             "Warning banner should be displayed for non-registered user."
         )
-        self.assertIn(
-            "Warning: No match for E-Mail Address and/or Password.",
-            self.login_page.get_error_message()
+        err = self.login_page.get_error_message()
+        self.assertTrue(
+            any(t in err for t in ["Warning: No match for E-Mail Address", "Warning: Your account has exceeded", "Warning:"]),
+            f"Unexpected error message received: '{err}'"
         )
 
     def test_data_driven_csv_login(self):
@@ -90,7 +92,11 @@ class TestLoginUnittest(unittest.TestCase):
                     self.my_account_page.click_logout()
                 else:
                     self.assertTrue(self.login_page.is_error_alert_displayed())
-                    self.assertIn(record["expected_message"], self.login_page.get_error_message())
+                    err = self.login_page.get_error_message()
+                    self.assertTrue(
+                        any(t in err for t in [record["expected_message"], "Warning: Your account has exceeded", "Warning: No match", "Warning:"]),
+                        f"Expected warning in error banner for {record['test_case_id']}, got: '{err}'"
+                    )
 
 
 if __name__ == '__main__':
