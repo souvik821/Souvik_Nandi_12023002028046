@@ -45,4 +45,4 @@ class LoginPage(BasePage):
 
     def is_error_alert_displayed(self) -> bool:
         """Validates presence of failure warning banner."""
-        return self.is_visible(self._ALERT_DANGER, timeout=5)
+        return self.is_visible(self._ALERT_DANGER, timeout=2)

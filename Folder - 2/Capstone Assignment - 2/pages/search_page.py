@@ -46,4 +46,4 @@ class SearchPage(BasePage):
 
     def has_results(self) -> bool:
         """Returns True if at least one product layout exists."""
-        return self.is_visible(self._PRODUCT_LAYOUTS, timeout=5)
+        return self.is_visible(self._PRODUCT_LAYOUTS, timeout=2)

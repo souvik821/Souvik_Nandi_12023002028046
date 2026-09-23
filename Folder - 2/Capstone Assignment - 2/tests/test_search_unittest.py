@@ -16,10 +16,16 @@ from utils.screenshot_util import ScreenshotUtil
 class TestSearchUnittest(unittest.TestCase):
     """Unittest Framework Test Case for Product Search Workflows with POM and Failure Screenshot hooks."""
 
-    def setUp(self):
-        self.config = ConfigReader()
-        self.driver = DriverFactory.create_driver()
-        self.search_page = SearchPage(self.driver)
+    @classmethod
+    def setUpClass(cls):
+        cls.config = ConfigReader()
+        cls.driver = DriverFactory.create_driver()
+        cls.search_page = SearchPage(cls.driver)
+
+    @classmethod
+    def tearDownClass(cls):
+        if hasattr(cls, 'driver') and cls.driver:
+            cls.driver.quit()
 
     def tearDown(self):
         try:
@@ -30,9 +36,6 @@ class TestSearchUnittest(unittest.TestCase):
                     ScreenshotUtil.capture_screenshot(self.driver, f"unittest_{self._testMethodName}")
         except Exception as e:
             print(f"Warning in tearDown screenshot hook: {e}")
-        finally:
-            if hasattr(self, 'driver') and self.driver:
-                self.driver.quit()
 
     def test_search_existing_product(self):
         """Verify searching for an existing product returns matching catalog items."""
@@ -60,9 +63,9 @@ class TestSearchUnittest(unittest.TestCase):
     def test_data_driven_csv_search(self):
         """Iterate through search_data.csv records in Unittest."""
         test_records = CSVReader.get_search_test_data()
+        self.search_page.open(self.config.base_url)
         for record in test_records:
             with self.subTest(case=record["test_case_id"]):
-                self.search_page.open(self.config.base_url)
                 self.search_page.search_product(record["search_term"])
 
                 if record["expected_status"].upper() == "FOUND":

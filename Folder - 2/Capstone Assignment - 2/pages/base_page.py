@@ -1,3 +1,4 @@
+import time
 from typing import List, Tuple
 from selenium.webdriver.remote.webdriver import WebDriver
 from selenium.webdriver.remote.webelement import WebElement
@@ -5,14 +6,18 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.common.exceptions import TimeoutException, NoSuchElementException
 
+from utils.config_reader import ConfigReader
+
 
 class BasePage:
     """Base Page Object encapsulating common WebDriver interactions with dynamic explicit waits."""
 
-    def __init__(self, driver: WebDriver, timeout: int = 15):
+    def __init__(self, driver: WebDriver, timeout: int = 10):
         self.driver = driver
         self.wait = WebDriverWait(driver, timeout)
         self.timeout = timeout
+        self.config = ConfigReader()
+        self.action_delay = self.config.action_delay
 
     def navigate_to(self, url: str) -> None:
         """Navigates browser to target URL."""
@@ -30,15 +35,19 @@ class BasePage:
             return []
 
     def click(self, locator: Tuple[str, str]) -> None:
-        """Waits until element is clickable and executes click action."""
+        """Waits until element is clickable and executes click action with controlled speed."""
         element = self.wait.until(EC.element_to_be_clickable(locator))
+        if self.action_delay > 0:
+            time.sleep(self.action_delay)
         element.click()
 
     def send_keys(self, locator: Tuple[str, str], text: str, clear_first: bool = True) -> None:
-        """Clears input and types text sequence."""
+        """Clears input and types text sequence with controlled speed."""
         element = self.find(locator)
         if clear_first:
             element.clear()
+        if self.action_delay > 0:
+            time.sleep(self.action_delay)
         element.send_keys(text)
 
     def get_text(self, locator: Tuple[str, str]) -> str:

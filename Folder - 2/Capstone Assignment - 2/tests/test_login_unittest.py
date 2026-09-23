@@ -17,11 +17,21 @@ from utils.screenshot_util import ScreenshotUtil
 class TestLoginUnittest(unittest.TestCase):
     """Unittest Framework Test Case for Login Workflows with POM and Failure Screenshot hooks."""
 
+    @classmethod
+    def setUpClass(cls):
+        cls.config = ConfigReader()
+        cls.driver = DriverFactory.create_driver()
+        cls.login_page = LoginPage(cls.driver)
+        cls.my_account_page = MyAccountPage(cls.driver)
+
+    @classmethod
+    def tearDownClass(cls):
+        if hasattr(cls, 'driver') and cls.driver:
+            cls.driver.quit()
+
     def setUp(self):
-        self.config = ConfigReader()
-        self.driver = DriverFactory.create_driver()
-        self.login_page = LoginPage(self.driver)
-        self.my_account_page = MyAccountPage(self.driver)
+        # Clear cookies between test methods to ensure clean authentication state
+        self.driver.delete_all_cookies()
 
     def tearDown(self):
         try:
@@ -33,9 +43,6 @@ class TestLoginUnittest(unittest.TestCase):
                     ScreenshotUtil.capture_screenshot(self.driver, f"unittest_{self._testMethodName}")
         except Exception as e:
             print(f"Warning in tearDown screenshot hook: {e}")
-        finally:
-            if hasattr(self, 'driver') and self.driver:
-                self.driver.quit()
 
     def test_valid_login(self):
         """Verify valid user login routes to My Account dashboard."""

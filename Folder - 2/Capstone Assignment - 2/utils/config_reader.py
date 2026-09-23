@@ -86,3 +86,11 @@ class ConfigReader:
     @property
     def reports_dir(self) -> str:
         return self.get('paths', 'reports_dir', 'reports')
+
+    @property
+    def action_delay(self) -> float:
+        try:
+            return float(self.get('speed', 'action_delay', '0.25'))
+        except (ValueError, TypeError):
+            return 0.25
+

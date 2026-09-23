@@ -22,7 +22,8 @@ class TestLoginPyTest:
         login_page = LoginPage(driver)
         my_account_page = MyAccountPage(driver)
 
-        # 1. Navigate to Login Page
+        # 1. Navigate to Login Page with isolated session
+        driver.delete_all_cookies()
         login_page.open(config.login_url)
 
         # 2. Perform Login with CSV inputs

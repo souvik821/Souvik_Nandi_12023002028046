@@ -13,12 +13,12 @@ from utils.screenshot_util import ScreenshotUtil
 from utils.config_reader import ConfigReader
 
 
-@pytest.fixture(scope="function")
+@pytest.fixture(scope="class")
 def driver(request):
-    """Initializes a clean WebDriver instance per test function and guarantees teardown."""
-    config = ConfigReader()
+    """Initializes a clean WebDriver instance per test class and guarantees teardown."""
     drv = DriverFactory.create_driver()
-    request.node.driver = drv
+    if request.cls:
+        request.cls.driver = drv
 
     yield drv
 
@@ -37,6 +37,8 @@ def pytest_runtest_makereport(item, call):
 
     if report.when == "call" and report.failed:
         drv = getattr(item, "driver", None)
+        if drv is None and getattr(item, "cls", None) is not None:
+            drv = getattr(item.cls, "driver", None)
         if drv is not None:
             # 1. Save PNG screenshot on filesystem
             screenshot_path = ScreenshotUtil.capture_screenshot(drv, item.name)
