@@ -33,7 +33,7 @@ You can run the automation test suite using the all-in-one bash runner script or
 
 #### Method 1: Using the All-in-One Bash Runner (Recommended)
 ```bash
-cd "Folder - 2/Capstone Assignment - 2"
+cd "Folder - 2"
 
 # Run all test suites with visible Chrome UI window (Default):
 ./run.bash
@@ -45,7 +45,7 @@ cd "Folder - 2/Capstone Assignment - 2"
 ./run.bash --install      # Auto-setup virtualenv and dependencies
 ./run.bash --open         # Open HTML test reports in your browser
 ```
-*(Aliases supported: `./run.sh`, `bash run.bash`, or `./run_capstone.sh` from the repository root)*
+*(Aliases supported: `./run.sh`, `bash run.bash`, or `./run_capstone.sh`)*
 
 #### Method 2: Direct Python Execution
 ```bash
