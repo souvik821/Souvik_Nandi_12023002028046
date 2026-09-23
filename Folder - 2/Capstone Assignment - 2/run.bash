@@ -23,12 +23,18 @@ cd "$PROJECT_DIR"
 
 # Print Header Banner
 print_banner() {
+    local MODE_DESC="Visible UI (Chrome Window Opens)"
+    if [ "$HEADLESS" = "true" ]; then
+        MODE_DESC="Headless (Background Execution)"
+    fi
+
     echo -e "${CYAN}==============================================================================${NC}"
     echo -e "${BOLD}${BLUE}   CAPSTONE ASSIGNMENT 2: SELENIUM PYTHON AUTOMATION TEST RUNNER${NC}"
     echo -e "${CYAN}==============================================================================${NC}"
     echo -e " Candidate       : ${BOLD}Souvik Nandi${NC} (Student ID: ${BOLD}12023002028046${NC})"
     echo -e " Email           : ${CYAN}souviknandi19102005@gmail.com${NC}"
     echo -e " Target System   : ${BOLD}https://tutorialsninja.com/demo/${NC}"
+    echo -e " Browser Mode    : ${BOLD}${GREEN}${MODE_DESC}${NC}"
     echo -e " Architecture    : ${BOLD}Page Object Model (POM) with Dual Engines (PyTest + Unittest)${NC}"
     echo -e " Project Root    : ${PROJECT_DIR}"
     echo -e "${CYAN}==============================================================================${NC}\n"
@@ -36,24 +42,31 @@ print_banner() {
 
 # Print Usage / Help
 show_help() {
-    echo -e "${BOLD}Usage:${NC} ./run.bash [OPTION]"
+    echo -e "${BOLD}Usage:${NC} ./run.bash [OPTIONS]"
     echo ""
-    echo -e "${BOLD}Options:${NC}"
-    echo "  --all         (Default) Run both Unittest and PyTest automation suites"
-    echo "  --pytest      Run PyTest automation suite only with HTML report"
-    echo "  --unittest    Run Unittest automation suite only with HTML report"
-    echo "  --install     Setup virtual environment and install all dependencies"
-    echo "  --clean       Clean test reports, cache files, and temp artifacts"
-    echo "  --open        Open generated HTML test reports in your default browser"
-    echo "  --help, -h    Display this help message and exit"
+    echo -e "${BOLD}Test Execution Options:${NC}"
+    echo "  --all            (Default) Run both Unittest and PyTest automation suites"
+    echo "  --pytest         Run PyTest automation suite only with HTML report"
+    echo "  --unittest       Run Unittest automation suite only with HTML report"
+    echo ""
+    echo -e "${BOLD}UI Visibility Options:${NC}"
+    echo "  --ui, --headed   (Default) Launch Chrome with visible UI window on screen"
+    echo "  --headless       Run silently in background without launching browser window"
+    echo ""
+    echo -e "${BOLD}Utility & Maintenance Options:${NC}"
+    echo "  --install        Setup virtual environment and install all dependencies"
+    echo "  --clean          Clean test reports, cache files, and temp artifacts"
+    echo "  --open           Open generated HTML test reports in your default browser"
+    echo "  --help, -h       Display this help message and exit"
     echo ""
     echo -e "${BOLD}Examples:${NC}"
-    echo "  ./run.bash               # Run all tests (Unittest + PyTest)"
-    echo "  ./run.bash --pytest      # Run PyTest tests only"
-    echo "  ./run.bash --unittest    # Run Unittest tests only"
-    echo "  ./run.bash --install     # Install required Python packages"
-    echo "  ./run.bash --clean       # Clean old reports and pycache"
-    echo "  ./run.bash --open        # Open latest generated reports in browser"
+    echo "  ./run.bash                       # Run all tests with visible Chrome UI window"
+    echo "  ./run.bash --pytest              # Run PyTest tests with visible Chrome UI"
+    echo "  ./run.bash --unittest            # Run Unittest tests with visible Chrome UI"
+    echo "  ./run.bash --pytest --headless   # Run PyTest tests in headless background mode"
+    echo "  ./run.bash --install             # Install required Python packages"
+    echo "  ./run.bash --clean               # Clean old reports and pycache"
+    echo "  ./run.bash --open                # Open latest generated reports in browser"
     echo ""
 }
 
@@ -163,12 +176,26 @@ open_reports() {
 execute_tests() {
     local RUNNER_TYPE="$1"
     export PYTHONPATH="$PROJECT_DIR"
+    export HEADLESS="$HEADLESS"
 
-    echo -e "${MAGENTA}[RUN] Executing automated test suite: ${BOLD}$RUNNER_TYPE${NC}...\n"
+    local UI_MSG="Visible Chrome Browser Window"
+    if [ "$HEADLESS" = "true" ]; then
+        UI_MSG="Headless Mode (Silently in Background)"
+    fi
+
+    echo -e "${MAGENTA}[RUN] Executing automated test suite: ${BOLD}$RUNNER_TYPE${NC}"
+    echo -e "${CYAN}[UI]  Browser Mode: ${BOLD}$UI_MSG${NC}\n"
     
+    local HEADLESS_FLAG=""
+    if [ "$HEADLESS" = "true" ]; then
+        HEADLESS_FLAG="--headless"
+    else
+        HEADLESS_FLAG="--ui"
+    fi
+
     # We do not use set -e here so we can capture exit code and print summary
     set +e
-    $PYTHON_CMD "$PROJECT_DIR/run_tests.py" --runner "$RUNNER_TYPE"
+    $PYTHON_CMD "$PROJECT_DIR/run_tests.py" --runner "$RUNNER_TYPE" $HEADLESS_FLAG
     local EXIT_CODE=$?
     set -e
 
@@ -196,54 +223,84 @@ execute_tests() {
     return $EXIT_CODE
 }
 
-# Main Script Dispatcher
+# Main Script Dispatcher with flexible option parsing
 main() {
-    local ACTION="${1:---all}"
+    local RUNNER="all"
+    export HEADLESS="false" # Default to Visible UI
+    local ACTION="test"
+
+    while [[ $# -gt 0 ]]; do
+        case "$1" in
+            --help|-h)
+                ACTION="help"
+                shift
+                ;;
+            --clean)
+                ACTION="clean"
+                shift
+                ;;
+            --install)
+                ACTION="install"
+                shift
+                ;;
+            --open)
+                ACTION="open"
+                shift
+                ;;
+            --headless)
+                export HEADLESS="true"
+                shift
+                ;;
+            --ui|--headed|--visible)
+                export HEADLESS="false"
+                shift
+                ;;
+            --pytest)
+                RUNNER="pytest"
+                shift
+                ;;
+            --unittest)
+                RUNNER="unittest"
+                shift
+                ;;
+            --all)
+                RUNNER="all"
+                shift
+                ;;
+            *)
+                echo -e "${RED}[ERROR] Unrecognized option: $1${NC}\n"
+                show_help
+                exit 1
+                ;;
+        esac
+    done
 
     case "$ACTION" in
-        --help|-h)
+        help)
             print_banner
             show_help
             exit 0
             ;;
-        --clean)
+        clean)
             print_banner
             clean_artifacts
             exit 0
             ;;
-        --install)
+        install)
             print_banner
             install_dependencies
             exit 0
             ;;
-        --open)
+        open)
             print_banner
             open_reports
             exit 0
             ;;
-        --pytest)
+        test)
             print_banner
             setup_environment
-            execute_tests "pytest"
+            execute_tests "$RUNNER"
             exit $?
-            ;;
-        --unittest)
-            print_banner
-            setup_environment
-            execute_tests "unittest"
-            exit $?
-            ;;
-        --all)
-            print_banner
-            setup_environment
-            execute_tests "all"
-            exit $?
-            ;;
-        *)
-            print_banner
-            echo -e "${RED}[ERROR] Unrecognized option: $ACTION${NC}\n"
-            show_help
-            exit 1
             ;;
     esac
 }

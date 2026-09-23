@@ -165,7 +165,23 @@ def main():
         default="all",
         help="Select test runner: 'pytest', 'unittest', or 'all' (default: all)"
     )
+    parser.add_argument(
+        "--headless",
+        action="store_true",
+        help="Run tests in background (headless) mode without visible browser window"
+    )
+    parser.add_argument(
+        "--headed", "--ui",
+        action="store_true",
+        default=True,
+        help="Run tests with visible browser window UI (default)"
+    )
     args = parser.parse_args()
+
+    if args.headless:
+        os.environ['HEADLESS'] = 'true'
+    else:
+        os.environ['HEADLESS'] = 'false'
 
     project_root = Path(__file__).resolve().parent
     if str(project_root) not in sys.path:

@@ -54,7 +54,10 @@ class ConfigReader:
 
     @property
     def is_headless(self) -> bool:
-        return self.getboolean('browser', 'headless', True)
+        env_headless = os.getenv('HEADLESS')
+        if env_headless is not None:
+            return env_headless.lower() in ('true', '1', 'yes')
+        return self.getboolean('browser', 'headless', fallback=False)
 
     @property
     def page_load_strategy(self) -> str:

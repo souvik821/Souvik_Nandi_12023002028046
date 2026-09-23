@@ -35,12 +35,13 @@ You can run the automation test suite using the all-in-one bash runner script or
 ```bash
 cd "Folder - 2/Capstone Assignment - 2"
 
-# Run all test suites (PyTest + Unittest) with HTML reports:
+# Run all test suites with visible Chrome UI window (Default):
 ./run.bash
 
-# Or run specific test runners:
-./run.bash --pytest       # Run PyTest suite only
-./run.bash --unittest     # Run Unittest suite only
+# Or run specific test suites with visible UI:
+./run.bash --pytest       # Run PyTest suite with visible Chrome UI
+./run.bash --unittest     # Run Unittest suite with visible Chrome UI
+./run.bash --headless     # Run in background without opening browser window
 ./run.bash --install      # Auto-setup virtualenv and dependencies
 ./run.bash --open         # Open HTML test reports in your browser
 ```

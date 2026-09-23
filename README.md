@@ -63,12 +63,13 @@ You can run the full test suite directly from the repository root:
 # Make executable (if needed):
 chmod +x run.bash
 
-# Run all test suites (PyTest + Unittest) with HTML reports:
+# Run all test suites with visible Chrome UI window (Default):
 ./run.bash
 
-# Or run specific test runners:
-./run.bash --pytest       # Run PyTest suite only
-./run.bash --unittest     # Run Unittest suite only
+# Or run specific test runners with visible UI:
+./run.bash --pytest       # Run PyTest suite with visible Chrome UI
+./run.bash --unittest     # Run Unittest suite with visible Chrome UI
+./run.bash --headless     # Run silently in background without browser window
 ./run.bash --install      # Auto-setup virtual environment & dependencies
 ./run.bash --clean        # Clean old reports and pycache
 ./run.bash --open         # Open generated HTML test reports in your default browser

@@ -196,14 +196,18 @@ An enterprise-grade bash script is provided to automate environment verification
 # Make executable (if not already):
 chmod +x run.bash
 
-# Run all test suites (PyTest + Unittest) with HTML reports (Default):
+# Run all test suites with visible Chrome browser window (Default):
 ./run.bash
 
-# Run PyTest suite only:
+# Run PyTest suite with visible Chrome UI:
 ./run.bash --pytest
 
-# Run Unittest suite only:
+# Run Unittest suite with visible Chrome UI:
 ./run.bash --unittest
+
+# Run in background (headless) mode without opening browser window:
+./run.bash --headless
+./run.bash --pytest --headless
 
 # Setup virtualenv and install dependencies automatically:
 ./run.bash --install
