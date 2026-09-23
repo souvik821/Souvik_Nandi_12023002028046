@@ -189,7 +189,34 @@ pip install -r requirements.txt
 
 ### 3. Run Test Suites
 
-#### A. Run Everything via Unified CLI Runner (Recommended)
+#### A. Run with All-in-One Bash Runner (`run.bash` / `run.sh`) [Recommended]
+An enterprise-grade bash script is provided to automate environment verification, virtualenv creation, dependency checking, test execution, and opening HTML reports:
+
+```bash
+# Make executable (if not already):
+chmod +x run.bash
+
+# Run all test suites (PyTest + Unittest) with HTML reports (Default):
+./run.bash
+
+# Run PyTest suite only:
+./run.bash --pytest
+
+# Run Unittest suite only:
+./run.bash --unittest
+
+# Setup virtualenv and install dependencies automatically:
+./run.bash --install
+
+# Clean old reports and bytecode cache:
+./run.bash --clean
+
+# Open generated HTML test reports directly in your browser:
+./run.bash --open
+```
+*(Supported execution aliases: `./run.sh`, `bash run.bash`, or `./run.brash`)*
+
+#### B. Run via Python CLI Runner
 ```bash
 # Execute both Unittest and PyTest suites with HTML reports
 python run_tests.py --runner all

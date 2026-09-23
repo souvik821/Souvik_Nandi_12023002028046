@@ -29,10 +29,26 @@
 
 ### 🚀 Quick Run Instructions
 
+You can run the automation test suite using the all-in-one bash runner script or via python:
+
+#### Method 1: Using the All-in-One Bash Runner (Recommended)
+```bash
+cd "Folder - 2/Capstone Assignment - 2"
+
+# Run all test suites (PyTest + Unittest) with HTML reports:
+./run.bash
+
+# Or run specific test runners:
+./run.bash --pytest       # Run PyTest suite only
+./run.bash --unittest     # Run Unittest suite only
+./run.bash --install      # Auto-setup virtualenv and dependencies
+./run.bash --open         # Open HTML test reports in your browser
+```
+*(Aliases supported: `./run.sh`, `bash run.bash`, or `./run_capstone.sh` from the repository root)*
+
+#### Method 2: Direct Python Execution
 ```bash
 cd "Folder - 2/Capstone Assignment - 2"
 pip install -r requirements.txt
-
-# Run all test suites (PyTest + Unittest) with HTML reports
 python run_tests.py --runner all
 ```
